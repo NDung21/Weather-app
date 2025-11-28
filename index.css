@@ -1,0 +1,275 @@
+:root {
+  --text-white: #ffffff;
+  --card-bg: rgba(0, 0, 0, 0.25);
+  --card-border: rgba(255, 255, 255, 0.1);
+  --card-blur: 20px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background: #000;
+  color: white;
+  overflow: hidden; 
+}
+
+.ios-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  transition: background 1s ease;
+  z-index: 1;
+}
+
+/* --- Dynamic Sky Backgrounds --- */
+.ios-wrapper.sunny { background: linear-gradient(180deg, #1877f2 0%, #6dd5fa 100%); }
+.ios-wrapper.night { background: linear-gradient(180deg, #050d18 0%, #172739 100%); }
+.ios-wrapper.cloudy { background: linear-gradient(180deg, #536976 0%, #292e49 100%); }
+.ios-wrapper.rain { background: linear-gradient(180deg, #203a43 0%, #2c5364 100%); }
+.ios-wrapper.default { background: linear-gradient(180deg, #2980b9 0%, #6dd5fa 100%); }
+
+.sky-layer {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  z-index: -1; pointer-events: none; overflow: hidden;
+}
+
+/* Sun & Moon Orbs */
+.sun-orb {
+  position: absolute; width: 80px; height: 80px;
+  background: radial-gradient(circle, #ffd700 20%, rgba(255, 215, 0, 0) 70%);
+  border-radius: 50%;
+  box-shadow: 0 0 60px 20px rgba(255, 215, 0, 0.6);
+  transform: translate(-50%, -50%);
+  transition: all 1s ease-out;
+}
+.moon-orb {
+  position: absolute; width: 60px; height: 60px;
+  background: transparent;
+  border-radius: 50%;
+  box-shadow: inset -10px -5px 0 0 #f0f0f0; /* Crescent shape */
+  transform: translate(-50%, -50%) rotate(-30deg);
+  filter: drop-shadow(0 0 10px rgba(255,255,255,0.8));
+}
+
+/* Stars */
+.stars {
+  position: absolute; top: 0; left: 0; width: 100%; height: 60%;
+  background-image: 
+    radial-gradient(1px 1px at 10% 10%, white, transparent),
+    radial-gradient(1px 1px at 20% 30%, white, transparent),
+    radial-gradient(2px 2px at 40% 70%, white, transparent),
+    radial-gradient(1px 1px at 60% 20%, white, transparent),
+    radial-gradient(1px 1px at 80% 50%, white, transparent),
+    radial-gradient(2px 2px at 90% 10%, white, transparent);
+  background-size: 500px 500px;
+  opacity: 0.8;
+}
+
+/* Clouds & Rain (simplified CSS art) */
+.cloud-layer { width: 100%; height: 100%; position: absolute; }
+.cloud {
+  background: rgba(255, 255, 255, 0.7);
+  width: 150px; height: 50px; border-radius: 50px;
+  position: absolute; filter: blur(20px);
+}
+.cloud.c1 { top: 20%; left: 10%; animation: float 30s infinite linear; }
+.cloud.c2 { top: 40%; right: 10%; animation: float 45s infinite linear reverse; }
+@keyframes float { from{transform: translateX(-50px)} to{transform: translateX(50px)} }
+
+.rain-drop { position: absolute; top: -20px; width: 1px; height: 30px; background: rgba(255,255,255,0.4); animation: rainFall 0.7s linear infinite; }
+@keyframes rainFall { to { transform: translateY(105vh); } }
+
+
+/* --- Search --- */
+.search-overlay {
+  position: absolute; top:0; left:0; right:0; bottom:0;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(20px);
+  z-index: 100;
+  display: flex; justify-content: center; align-items: center;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.search-overlay.minimize { opacity: 0; pointer-events: none; transform: scale(1.05); }
+.search-box { width: 85%; max-width: 350px; text-align: center; }
+.input-group input { 
+  background: rgba(255,255,255,0.1); border: none; border-radius: 10px;
+  color: white; width: 100%; padding: 12px 16px; margin-bottom: 12px; font-size: 1.1rem; 
+}
+.input-group input::placeholder { color: rgba(255,255,255,0.5); }
+.search-btn { 
+  width: 100%; padding: 14px; border-radius: 12px; border: none; 
+  background: #007aff; color: white; font-weight: 600; font-size: 1.1rem; cursor: pointer; 
+}
+.error-text { color: #ff453a; margin-top: 15px; }
+
+/* --- Main Layout --- */
+.main-content {
+  height: 100%;
+  display: flex; flex-direction: column;
+  overflow-y: auto; overflow-x: hidden;
+  padding: 0 16px 40px 16px;
+  scrollbar-width: none;
+}
+.main-content::-webkit-scrollbar { display: none; }
+.fade-in-up { animation: fadeInUp 0.5s ease-out; }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+.top-bar { 
+  display: flex; justify-content: space-between; align-items: center; 
+  padding-top: 40px; margin-bottom: 10px; text-align: center;
+}
+.back-btn { background: none; border: none; color: white; cursor: pointer; }
+.location-title { font-size: 1.5rem; font-weight: 500; cursor: pointer; text-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+
+/* Hero Section - Matching iOS Typography */
+.hero-section { text-align: center; margin-bottom: 40px; display: flex; flex-direction: column; align-items: center; }
+.temp-hero { 
+  font-size: 6rem; font-weight: 200; line-height: 1; letter-spacing: -2px; 
+  text-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+  margin-left: 10px; /* Optical centering */
+}
+.condition-hero { font-size: 1.4rem; font-weight: 400; text-transform: capitalize; opacity: 0.9; margin-top: 5px; }
+.hi-low { font-size: 1.2rem; font-weight: 400; margin-top: 0px; display: flex; gap: 12px; }
+
+/* Cards (Glassmorphism Refined) */
+.weather-card {
+  background: var(--card-bg);
+  backdrop-filter: blur(var(--card-blur));
+  -webkit-backdrop-filter: blur(var(--card-blur));
+  border-radius: 18px; 
+  /* Subtle border usually isn't visible on iOS, but good for web */
+  border: 1px solid var(--card-border);
+  padding: 14px 16px; margin-bottom: 12px;
+}
+.card-header-text {
+  font-size: 0.8rem; color: rgba(255,255,255,0.55); font-weight: 500; 
+  margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;
+  text-transform: uppercase; display: flex; align-items: center; gap: 6px;
+}
+.hourly-card { padding-right: 0; /* Let scroll hit edge */ }
+
+/* Hourly Scroll - FIXED: Force Hide Scrollbar */
+.hourly-scroll {
+  display: flex; overflow-x: auto; gap: 24px; padding-bottom: 12px; padding-right: 16px;
+  scroll-snap-type: x mandatory; cursor: grab; user-select: none;
+  
+  /* Hide scrollbar for IE, Edge and Firefox */
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+/* Hide scrollbar for Chrome, Safari and Opera */
+.hourly-scroll::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+.hourly-scroll:active { cursor: grabbing; }
+.hour-item {
+  display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 40px;
+  scroll-snap-align: start;
+}
+/* FIXED: No wrap for time label */
+.h-time { font-size: 0.95rem; font-weight: 600; white-space: nowrap; }
+
+/* New SVG Icon sizing */
+.weather-icon-small { width: 28px; height: 28px; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3)); }
+
+.h-temp { font-size: 1.2rem; font-weight: 500; }
+
+/* Daily List */
+.daily-list { display: flex; flex-direction: column; gap: 0; }
+.day-row {
+  display: flex; align-items: center; justify-content: space-between; height: 50px;
+  border-top: 1px solid rgba(255,255,255,0.1); cursor: pointer;
+}
+.day-row:first-child { border-top: none; }
+.d-day { width: 50px; font-weight: 500; font-size: 1.2rem; }
+.d-icon { width: 30px; text-align: center; display: flex; justify-content: center; }
+.d-min { width: 35px; text-align: right; opacity: 0.6; font-weight: 500; font-size: 1.1rem; }
+.d-max { width: 35px; text-align: right; font-weight: 500; font-size: 1.1rem; }
+
+/* Temperature Bar (iOS Style) */
+.d-temp-bar { flex: 1; margin: 0 14px; height: 5px; background: rgba(0,0,0,0.2); border-radius: 10px; position: relative; }
+.temp-range-bg { position: relative; width: 100%; height: 100%; border-radius: 10px; overflow: visible; }
+.temp-range-fill { 
+  position: absolute; height: 100%; border-radius: 10px; 
+  background: linear-gradient(90deg, #5ec3d6, #fabf3e); /* Cool to Warm gradient */
+}
+.current-dot {
+  position: absolute; top: 50%; width: 5px; height: 5px; 
+  background: white; border-radius: 50%; box-shadow: 0 0 0 2px rgba(0,0,0,0.3);
+  transform: translate(-50%, -50%); z-index: 2;
+}
+
+/* Details Grid */
+.details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.detail-item { 
+  aspect-ratio: 1; display: flex; flex-direction: column; position: relative; 
+  padding: 12px;
+}
+.detail-header { font-size: 0.75rem; color: rgba(255,255,255,0.55); font-weight: 600; margin-bottom: 2px; text-transform: uppercase; }
+.detail-value { font-size: 2.2rem; font-weight: 400; margin-top: 4px; letter-spacing: -1px; }
+.detail-sub { font-size: 0.9rem; margin-top: auto; font-weight: 500; }
+
+/* Visualizations */
+.uv-bar-container { margin-top: 15px; position: relative; height: 5px; background: rgba(255,255,255,0.2); border-radius: 3px; }
+.uv-bar { width: 100%; height: 100%; background: linear-gradient(90deg, green, yellow, orange, red, purple); border-radius: 3px; }
+.uv-dot { position: absolute; top: -3px; width: 10px; height: 10px; background: white; border-radius: 50%; box-shadow: 0 0 2px rgba(0,0,0,0.5); transform: translateX(-50%); border: 1px solid rgba(0,0,0,0.1); }
+
+/* Flat Compass */
+.compass-container { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; }
+.compass-circle { width: 90px; height: 90px; position: relative; display: flex; justify-content: center; align-items: center; }
+.compass-ticks { position: absolute; width: 100%; height: 100%; }
+.tick { position: absolute; top: 0; left: 50%; width: 2px; height: 6px; background: rgba(255,255,255,0.2); transform-origin: 50% 45px; transform: translateX(-50%); }
+.compass-label { position: absolute; font-size: 0.75rem; font-weight: 700; color: rgba(255,255,255,0.6); }
+.compass-label.n { top: -2px; left: 50%; transform: translateX(-50%); } 
+.compass-label.s { bottom: -2px; left: 50%; transform: translateX(-50%); } 
+.compass-label.e { right: -2px; top: 50%; transform: translateY(-50%); } 
+.compass-label.w { left: -2px; top: 50%; transform: translateY(-50%); }
+.compass-arrow-container { position: absolute; width: 100%; height: 100%; transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1); }
+.compass-arrow { 
+  position: absolute; top: 15px; left: 50%; transform: translateX(-50%);
+  width: 0; height: 0; 
+  border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 16px solid white; 
+}
+.compass-center-text { text-align: center; margin-top: 0; }
+.speed-val { font-weight: 500; font-size: 1.1rem; display: block; }
+.speed-unit { font-size: 0.7rem; opacity: 0.6; }
+
+/* Sun Graph */
+.sun-viz-wrapper { margin-top: auto; margin-bottom: 10px; }
+.sun-times { display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 500; opacity: 0.9; margin-bottom: 5px; }
+.sun-svg { overflow: visible; }
+
+/* Pressure */
+.pressure-container { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; margin-top: 10px; }
+.gauge-outer { 
+  width: 100px; height: 100px; border-radius: 50%; 
+  border: 1px dashed rgba(255,255,255,0.3); /* Simplified dashed look */
+  position: relative;
+}
+.gauge-center-info { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+.gauge-hand { position: absolute; width: 100%; height: 100%; top: 0; left: 0; transition: transform 1s ease-out; }
+.hand-tip { position: absolute; top: 4px; left: 50%; width: 2px; height: 10px; background: white; transform: translateX(-50%); }
+
+.ai-advice-card {
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(255, 255, 255, 0.1); border: none;
+}
+.ai-icon { font-size: 1.2rem; }
+.ai-text { font-size: 0.9rem; font-style: italic; opacity: 0.9; }
+
+@media (max-width: 600px) {
+  .temp-hero { font-size: 5rem; }
+  .detail-value { font-size: 1.8rem; }
+  .compass-circle { width: 70px; height: 70px; }
+  .tick { transform-origin: 50% 35px; }
+}
